@@ -1,0 +1,40 @@
+name: "aiaudit"
+description: "Score PR diffs for AI-generated content and post an annotated comment."
+author: "Mukunda Katta"
+branding:
+  icon: "shield"
+  color: "purple"
+
+inputs:
+  base:
+    description: "Base ref / SHA to diff from"
+    required: true
+  head:
+    description: "Head ref / SHA to diff to"
+    required: true
+  comment:
+    description: "Post (or update) a PR comment with the audit results"
+    required: false
+    default: "true"
+  use_llm:
+    description: "Compose heuristic scorer with an LLM scorer (requires ANTHROPIC_API_KEY env)"
+    required: false
+    default: "false"
+  model:
+    description: "Anthropic model id when use_llm=true"
+    required: false
+    default: "claude-haiku-4-5"
+  github_token:
+    description: "GITHUB_TOKEN with pull-requests:write"
+    required: false
+    default: ${{ github.token }}
+
+outputs:
+  aggregate_score:
+    description: "0..1 confidence-weighted AI-likelihood across all hunks"
+  total_hunks:
+    description: "Count of hunks analyzed"
+
+runs:
+  using: "node20"
+  main: "dist-action/index.js"

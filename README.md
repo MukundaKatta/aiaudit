@@ -45,12 +45,30 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with: { fetch-depth: 0 }
-      - uses: mukundakatta/aiaudit-action@v0
+      - uses: MukundaKatta/aiaudit@v0
         with:
           base: ${{ github.event.pull_request.base.sha }}
           head: ${{ github.event.pull_request.head.sha }}
           comment: true
+          # Optional: compose with an LLM scorer
+          # use_llm: true
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
 ```
+
+The action posts (or updates) a single comment on the PR with the aggregate AI-likelihood score and the top 5 suspect hunks.
+
+**Inputs:**
+- `base` (required) — base SHA to diff from
+- `head` (required) — head SHA to diff to
+- `comment` (default `true`) — post/update the PR comment
+- `use_llm` (default `false`) — add the LLM scorer; requires `ANTHROPIC_API_KEY`
+- `model` (default `claude-haiku-4-5`) — model used when `use_llm: true`
+- `github_token` (default `${{ github.token }}`)
+
+**Outputs:**
+- `aggregate_score` — 0..1 confidence-weighted AI-likelihood
+- `total_hunks` — hunks analyzed
 
 ## How it scores
 
